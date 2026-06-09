@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#46684f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TokyoTrip" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <title>Tokyo Trip Planner PWA</title>
+  <style>
+    :root {
+      --bg:#efe5c9; --bg2:#fbf7eb; --card:rgba(255,255,255,.8); --line:#d6decc;
+      --green:#365744; --green2:#4a6b55; --muted:#718373; --soft:#f7f1df; --soft2:#eef4e3;
+      --shadow:0 18px 50px rgba(53,85,66,.12);
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif; color:var(--green); background:radial-gradient(circle at top, #f3ead2, #efe3c1 35%, #eadfbe 70%, #e8dbb6); }
+    .shell { max-width:460px; margin:0 auto; min-height:100vh; padding:10px 12px 22px; }
+    .phone { background:var(--bg2); border:1px solid var(--line); border-radius:38px; overflow:hidden; box-shadow:0 30px 90px rgba(53,85,66,.18); min-height:calc(100vh - 24px); }
+    .status { display:flex; justify-content:space-between; align-items:center; padding:10px 16px 6px; font-size:11px; color:white; background:var(--green); }
+    .hero { background:linear-gradient(135deg, #46684f 0%, #6d8f73 100%); color:white; padding:16px 16px 18px; }
+    .eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:.3em; color:rgba(255,255,255,.68); }
+    h1 { margin:10px 0 4px; font-size:28px; line-height:1.15; }
+    .hero-sub { font-size:14px; color:rgba(255,255,255,.82); }
+    .hero-date { font-size:12px; color:rgba(255,255,255,.66); margin-top:4px; }
+    .hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .glass { background:rgba(255,255,255,.12); border-radius:22px; padding:12px; backdrop-filter:blur(10px); }
+    .glass .label { font-size:11px; color:rgba(255,255,255,.68); }
+    .glass .value { margin-top:4px; font-size:14px; font-weight:600; line-height:1.35; }
+    .content { padding:14px; padding-bottom:86px; }
+    .tabs { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; background:#f2ead5; border-radius:20px; padding:6px; }
+    .tab { border:none; background:transparent; border-radius:16px; padding:10px 6px; font-size:13px; color:#6f856f; cursor:pointer; }
+    .tab.active { background:white; color:var(--green); font-weight:700; box-shadow:0 2px 12px rgba(54,87,68,.06); }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:28px; padding:15px; box-shadow:0 8px 22px rgba(54,87,68,.04); margin-top:12px; }
+    .titleRow { display:flex; align-items:center; gap:10px; }
+    .titleIcon { width:34px; height:34px; display:grid; place-items:center; border-radius:14px; background:var(--soft2); color:#46654e; }
+    .titleText .t1 { font-size:14px; font-weight:700; }
+    .titleText .t2 { font-size:12px; color:#7a8d7d; margin-top:1px; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .metric { border-radius:24px; padding:14px; }
+    .metric.a { background:var(--soft); } .metric.b { background:var(--soft2); }
+    .metric .k { font-size:12px; color:#7a8d7d; } .metric .v { font-size:30px; font-weight:800; margin-top:4px; }
+    .bar { margin-top:10px; background:#e3eadc; height:8px; border-radius:999px; overflow:hidden; } .bar > span { display:block; height:100%; background:var(--green2); border-radius:999px; }
+    .dayRow, .filters { display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; margin-top:12px; }
+    .chipBtn { min-width:fit-content; border:1px solid #d3dbd0; background:white; border-radius:18px; padding:10px 12px; cursor:pointer; }
+    .chipBtn.active { background:#edf4ec; border-color:var(--green2); }
+    .chipBtn .k { font-size:14px; font-weight:700; } .chipBtn .v { font-size:12px; color:#738576; margin-top:3px; }
+    .themeBox { margin-top:12px; padding:14px; border-radius:24px; background:var(--soft); }
+    .themeBox .t1 { font-size:16px; font-weight:700; } .themeBox .t2 { margin-top:4px; font-size:13px; color:#738576; }
+    .searchWrap { position:relative; margin-top:12px; }
+    .searchWrap input { width:100%; padding:12px 14px 12px 38px; border:1px solid var(--line); border-radius:18px; background:white; font:inherit; color:var(--green); }
+    .searchWrap .icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#90a393; }
+    .itemCard { background:var(--card); border:1px solid var(--line); border-radius:28px; padding:14px; box-shadow:0 8px 22px rgba(54,87,68,.04); margin-top:12px; }
+    .itemCard.done { background:#eef6ee; }
+    .itemRow { display:flex; gap:12px; align-items:flex-start; }
+    .check { width:28px; height:28px; border-radius:999px; border:1.5px solid #9cb19e; background:white; color:transparent; display:grid; place-items:center; margin-top:2px; cursor:pointer; font-weight:700; }
+    .check.done { background:var(--green2); border-color:var(--green2); color:white; }
+    .timePill { min-width:74px; text-align:center; padding:10px 12px; border-radius:18px; background:#f2ead5; font-size:14px; font-weight:700; }
+    .iconPill { width:34px; height:34px; display:grid; place-items:center; border-radius:14px; background:var(--soft2); color:#46654e; font-size:15px; }
+    .itemMain { flex:1; }
+    .itemHead { display:flex; gap:10px; align-items:center; }
+    .itemText { margin-top:10px; font-size:16px; font-weight:700; line-height:1.35; }
+    .itemCard.done .itemText { color:#7f9181; text-decoration:line-through; }
+    .meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; align-items:center; }
+    .pill { border-radius:999px; padding:5px 9px; font-size:11px; font-weight:700; border:1px solid transparent; }
+    .tag { font-size:11px; letter-spacing:.08em; color:#8fa28f; text-transform:uppercase; }
+    .summaryBox { border-radius:24px; padding:14px; background:var(--soft); }
+    .note { width:100%; min-height:144px; border:1px solid var(--line); border-radius:24px; padding:14px; background:white; font:inherit; color:var(--green); resize:vertical; }
+    .quickGrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
+    .quick { border:1px solid var(--line); background:white; border-radius:24px; padding:14px 8px; text-align:center; cursor:pointer; }
+    .quick .circle { width:42px; height:42px; border-radius:16px; display:grid; place-items:center; background:var(--soft2); color:#46654e; margin:0 auto; }
+    .quick .txt { margin-top:8px; font-size:12px; font-weight:600; }
+    .bottom { position:sticky; bottom:0; left:0; right:0; background:rgba(255,255,255,.86); backdrop-filter:blur(12px); border-top:1px solid #e2e8dd; padding:10px 12px 14px; }
+    .bottomGrid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .bbtn { border:none; background:transparent; border-radius:18px; padding:10px 8px; color:#728672; cursor:pointer; }
+    .bbtn.active { background:#edf4ec; color:var(--green); font-weight:700; }
+    .bbtn .ico { font-size:16px; } .bbtn .txt { margin-top:4px; font-size:11px; }
+    .hidden { display:none !important; }
+    .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:96px; background:#365744; color:white; padding:10px 14px; border-radius:999px; font-size:12px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:.22s ease; }
+    .toast.show { opacity:1; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="phone">
+      <div class="status">
+        <span id="statusTime">--:--</span>
+        <span>▂ ▃ ▅ &nbsp; ⌁ &nbsp; ▰</span>
+      </div>
+      <div class="hero">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+          <div>
+            <div class="eyebrow">Tokyo Trip</div>
+            <h1>🌴 細雨東京旅行計劃表</h1>
+            <div class="hero-sub">東京輕旅行・PWA 版旅程助手</div>
+            <div class="hero-date">2026年6月10日 — 6月14日</div>
+          </div>
+          <div class="glass" style="max-width:155px;text-align:right;">
+            <div class="label">出發倒數</div>
+            <div class="value" id="countdown">載入中…</div>
+          </div>
+        </div>
+        <div class="hero-grid">
+          <div class="glass"><div class="label">去程</div><div class="value">01:15 起飛 → 06:45 抵達成田</div></div>
+          <div class="glass"><div class="label">回程</div><div class="value">15:45 起飛 → 19:40 抵達香港</div></div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="tabs">
+          <button class="tab active" data-tab="home">主頁</button>
+          <button class="tab" data-tab="itinerary">行程</button>
+          <button class="tab" data-tab="packing">清單</button>
+          <button class="tab" data-tab="summary">摘要</button>
+        </div>
+
+        <section id="homeView">
+          <div class="card">
+            <div class="titleRow">
+              <div class="titleIcon">✨</div>
+              <div class="titleText"><div class="t1">旅程總覽</div><div class="t2">最似真 app 嘅 dashboard</div></div>
+            </div>
+            <div class="grid2">
+              <div class="metric a"><div class="k">行程完成度</div><div class="v" id="homeTripPct">0%</div><div class="bar"><span id="homeTripBar" style="width:0%"></span></div></div>
+              <div class="metric b"><div class="k">旅行清單</div><div class="v" id="homePackPct">0%</div><div class="bar"><span id="homePackBar" style="width:0%"></span></div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="titleRow">
+              <div class="titleIcon">📅</div>
+              <div class="titleText"><div class="t1">下一日程</div><div class="t2">快速睇下一個重點</div></div>
+            </div>
+            <div class="summaryBox" id="nextPreview"></div>
+          </div>
+
+          <div class="quickGrid">
+            <button class="quick" data-go="summary"><div class="circle">🏨</div><div class="txt">酒店</div></button>
+            <button class="quick" data-go="summary"><div class="circle">✈️</div><div class="txt">航班</div></button>
+            <button class="quick" data-go="packing"><div class="circle">🎒</div><div class="txt">清單</div></button>
+            <button class="quick" data-go="itinerary"><div class="circle">🗓️</div><div class="txt">行程</div></button>
+          </div>
+        </section>
+
+        <section id="itineraryView" class="hidden">
+          <div class="card">
+            <div class="titleRow">
+              <div class="titleIcon">🗓️</div>
+              <div class="titleText"><div class="t1">行程時間表</div><div class="t2">日期切換 + 篩選 + 搜尋</div></div>
+            </div>
+            <div class="dayRow" id="dayRow"></div>
+            <div class="themeBox"><div class="t1" id="activeTheme"></div><div class="t2" id="activeDate"></div></div>
+            <div class="searchWrap"><span class="icon">🔎</span><input id="searchInput" placeholder="搜尋時間或行程內容…" /></div>
+            <div class="filters" id="filterRow"></div>
+          </div>
+          <div id="itemsContainer"></div>
+        </section>
+
+        <section id="packingView" class="hidden">
+          <div class="card">
+            <div class="titleRow">
+              <div class="titleIcon">🎒</div>
+              <div class="titleText"><div class="t1">旅行清單</div><div class="t2">逐件勾選，會自動儲存</div></div>
+            </div>
+            <div class="summaryBox" style="margin-top:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;">
+                <div><div style="font-size:12px;color:#7a8d7d;">完成度</div><div style="font-size:30px;font-weight:800;margin-top:4px;" id="packingPct">0%</div></div>
+                <div style="font-size:14px;color:#718373;" id="packingText">0 / 0 件</div>
+              </div>
+              <div class="bar"><span id="packingBar" style="width:0%"></span></div>
+            </div>
+          </div>
+          <div id="packingContainer"></div>
+        </section>
+
+        <section id="summaryView" class="hidden">
+          <div class="card">
+            <div class="titleRow">
+              <div class="titleIcon">✨</div>
+              <div class="titleText"><div class="t1">旅程摘要</div><div class="t2">航班、酒店、亮點一次睇晒</div></div>
+            </div>
+            <div class="grid2">
+              <div class="summaryBox"><div style="font-size:12px;color:#7a8d7d;">日期</div><div style="margin-top:4px;font-size:14px;font-weight:700;">2026年6月10日 — 6月14日</div></div>
+              <div class="summaryBox" style="background:#eef4e3;"><div style="font-size:12px;color:#7a8d7d;">住宿區域</div><div style="margin-top:4px;font-size:14px;font-weight:700;">豐洲</div></div>
+            </div>
+            <div class="summaryBox" style="background:#eef4e3;margin-top:12px;">
+              <div style="font-size:12px;color:#6f876f;">酒店資訊</div>
+              <div style="margin-top:4px;font-size:15px;font-weight:700;">三井花園飯店豐洲普米爾</div>
+              <div style="margin-top:4px;font-size:12px;color:#5f7662;">6/10–6/14 住宿</div>
+            </div>
+            <div id="highlights" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+          <div class="card">
+            <div class="titleRow">
+              <div class="titleIcon">📝</div>
+              <div class="titleText"><div class="t1">私人備註</div><div class="t2">寫低提醒，會自動儲存</div></div>
+            </div>
+            <textarea class="note" id="notes" placeholder="例如：記得帶轉插、Ushigoro S 準時到、最後一日預留時間去機場…"></textarea>
+          </div>
+        </section>
+      </div>
+
+      <div class="bottom">
+        <div class="bottomGrid">
+          <button class="bbtn active" data-tab="home"><div class="ico">🏠</div><div class="txt">主頁</div></button>
+          <button class="bbtn" data-tab="itinerary"><div class="ico">📅</div><div class="txt">行程</div></button>
+          <button class="bbtn" data-tab="packing"><div class="ico">🎒</div><div class="txt">清單</div></button>
+          <button class="bbtn" data-tab="summary"><div class="ico">✨</div><div class="txt">摘要</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast">已可加入主畫面</div>
+
+<script>
+const trip = {"title": "細雨東京旅行計劃表", "subtitle": "東京輕旅行・PWA 版旅程助手", "dateRange": "2026年6月10日 — 6月14日", "departureISO": "2026-06-10T01:15:00+08:00", "hotel": {"name": "三井花園飯店豐洲普米爾", "stay": "6/10–6/14 住宿", "district": "豐洲"}, "flights": {"outbound": "01:15 起飛 → 06:45 抵達成田", "inbound": "15:45 起飛 → 19:40 抵達香港"}, "days": [{"id": 1, "date": "6月10日（星期三）", "theme": "✈️ 出發日", "items": [{"time": "01:15", "text": "起飛前往東京", "type": "flight", "status": "重要"}, {"time": "06:45", "text": "抵達成田機場", "type": "arrival", "status": "抵達"}, {"time": "08:30", "text": "出關＋前往市區", "type": "transport", "status": "交通"}, {"time": "15:00", "text": "入住酒店", "type": "hotel", "status": "住宿"}, {"time": "18:30", "text": "周圍逛逛＋室內購物", "type": "shopping", "status": "行程"}, {"time": "21:30", "text": "晚餐", "type": "food", "status": "飲食"}, {"time": "23:00", "text": "回酒店休息", "type": "rest", "status": "休息"}]}, {"id": 2, "date": "6月11日（星期四）", "theme": "🌿 淺草・原宿日", "items": [{"time": "10:00", "text": "慢慢起床", "type": "rest", "status": "休息"}, {"time": "11:30", "text": "Brunch", "type": "food", "status": "飲食"}, {"time": "13:00", "text": "淺草寺", "type": "sightseeing", "status": "景點"}, {"time": "17:00", "text": "原宿 / 表參道 逛街", "type": "shopping", "status": "購物"}, {"time": "19:00", "text": "晚餐", "type": "food", "status": "飲食"}, {"time": "21:30", "text": "夜遊東京", "type": "night", "status": "夜景"}, {"time": "23:30", "text": "回酒店休息", "type": "rest", "status": "休息"}]}, {"id": 3, "date": "6月12日（星期五）", "theme": "🌸 銀座日", "items": [{"time": "10:30", "text": "慢慢起床", "type": "rest", "status": "休息"}, {"time": "12:00", "text": "午餐", "type": "food", "status": "飲食"}, {"time": "13:30", "text": "銀座", "type": "sightseeing", "status": "景點"}, {"time": "18:00", "text": "購物", "type": "shopping", "status": "購物"}, {"time": "20:00", "text": "Ushigoro S", "type": "reservation", "status": "預約"}, {"time": "22:30", "text": "欣賞夜景", "type": "night", "status": "夜景"}, {"time": "00:00", "text": "休息", "type": "rest", "status": "休息"}]}, {"id": 4, "date": "6月13日（星期六）", "theme": "⭐ 自由購物日", "items": [{"time": "10:30", "text": "慢慢起床", "type": "rest", "status": "休息"}, {"time": "12:00", "text": "Happy 午餐", "type": "food", "status": "飲食"}, {"time": "13:00", "text": "Ginza 掃貨", "type": "shopping", "status": "購物"}, {"time": "20:00", "text": "Dinner Time", "type": "food", "status": "飲食"}, {"time": "21:30", "text": "夜景散步", "type": "night", "status": "夜景"}, {"time": "23:30", "text": "收拾行李", "type": "packing", "status": "準備"}]}, {"id": 5, "date": "6月14日（星期日）", "theme": "✈️ 回程日", "items": [{"time": "12:00", "text": "最後午餐", "type": "food", "status": "飲食"}, {"time": "12:30", "text": "出發前往機場", "type": "transport", "status": "交通"}, {"time": "15:45", "text": "飛返香港", "type": "flight", "status": "重要"}, {"time": "19:40", "text": "抵達香港", "type": "arrival", "status": "抵達"}]}], "packing": [{"category": "證件", "items": ["護照", "身分證"]}, {"category": "金錢", "items": ["日圓（JPY）"]}, {"category": "電子用品", "items": ["轉插", "充電線", "SIM 卡", "行動電源"]}, {"category": "個人用品", "items": ["藥品", "衛生用品（必備）", "紙巾", "化妝品"]}, {"category": "其他", "items": ["雨傘", "旅伴"]}]};
+const filters = [
+  { key:'all', label:'全部' }, { key:'flight', label:'航班' }, { key:'transport', label:'交通' }, { key:'food', label:'飲食' },
+  { key:'shopping', label:'購物' }, { key:'sightseeing', label:'景點' }, { key:'night', label:'夜景' }, { key:'rest', label:'休息' }
+];
+const statusStyles = {
+  '重要':'background:#ffe4e6;color:#be123c;border-color:#fecdd3;',
+  '抵達':'background:#dcfce7;color:#15803d;border-color:#bbf7d0;',
+  '交通':'background:#e0f2fe;color:#0369a1;border-color:#bae6fd;',
+  '住宿':'background:#f3e8ff;color:#7e22ce;border-color:#ddd6fe;',
+  '飲食':'background:#fef3c7;color:#b45309;border-color:#fde68a;',
+  '景點':'background:#ccfbf1;color:#0f766e;border-color:#99f6e4;',
+  '購物':'background:#fae8ff;color:#a21caf;border-color:#f5d0fe;',
+  '夜景':'background:#e0e7ff;color:#4338ca;border-color:#c7d2fe;',
+  '準備':'background:#ffedd5;color:#c2410c;border-color:#fed7aa;',
+  '行程':'background:#ecfccb;color:#4d7c0f;border-color:#d9f99d;',
+  '休息':'background:#f1f5f9;color:#475569;border-color:#e2e8f0;',
+  '預約':'background:#fce7f3;color:#be185d;border-color:#fbcfe8;'
+};
+const iconMap = { flight:'✈️', arrival:'🏠', transport:'🚗', hotel:'🏨', shopping:'🛍️', food:'🍽️', sightseeing:'📍', night:'🌃', packing:'🧳', reservation:'🎟️', rest:'🌙' };
+let deferredPrompt = null;
+let state = {
+  tab:'home', selectedDay:1, filter:'all', search:'',
+  checked: JSON.parse(localStorage.getItem('tokyo-pwa-checked') || '{}'),
+  packingChecked: JSON.parse(localStorage.getItem('tokyo-pwa-packing') || '{}'),
+  notes: localStorage.getItem('tokyo-pwa-notes') || ''
+};
+
+function saveState() {
+  localStorage.setItem('tokyo-pwa-checked', JSON.stringify(state.checked));
+  localStorage.setItem('tokyo-pwa-packing', JSON.stringify(state.packingChecked));
+  localStorage.setItem('tokyo-pwa-notes', state.notes);
+}
+function countdownText() {
+  const now = new Date(); const target = new Date(trip.departureISO); const diff = target.getTime() - now.getTime();
+  if (diff <= 0) return '已出發 / 旅程進行中';
+  const days = Math.floor(diff / (1000*60*60*24)); const hours = Math.floor((diff / (1000*60*60)) % 24); const mins = Math.floor((diff / (1000*60)) % 60);
+  return `${days}日 ${hours}小時 ${mins}分鐘後出發`;
+}
+function itineraryStats() { const keys = trip.days.flatMap(day => day.items.map((_, idx) => `${day.id}-${idx}`)); const done = keys.filter(k => state.checked[k]).length; const total = keys.length; return { done, total, pct: total ? Math.round(done/total*100) : 0 }; }
+function packingStats() { const keys = trip.packing.flatMap((group, gIdx) => group.items.map((_, iIdx) => `${gIdx}-${iIdx}`)); const done = keys.filter(k => state.packingChecked[k]).length; const total = keys.length; return { done, total, pct: total ? Math.round(done/total*100) : 0 }; }
+function setTab(tab) {
+  state.tab = tab;
+  document.querySelectorAll('.tab, .bbtn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+  document.getElementById('homeView').classList.toggle('hidden', tab !== 'home');
+  document.getElementById('itineraryView').classList.toggle('hidden', tab !== 'itinerary');
+  document.getElementById('packingView').classList.toggle('hidden', tab !== 'packing');
+  document.getElementById('summaryView').classList.toggle('hidden', tab !== 'summary');
+}
+function renderHome() {
+  const it = itineraryStats(); const pk = packingStats();
+  document.getElementById('homeTripPct').textContent = `${it.pct}%`; document.getElementById('homeTripBar').style.width = `${it.pct}%`;
+  document.getElementById('homePackPct').textContent = `${pk.pct}%`; document.getElementById('homePackBar').style.width = `${pk.pct}%`;
+  const ongoing = trip.days.find(day => day.items.some((_, idx) => !state.checked[`${day.id}-${idx}`])) || trip.days[0];
+  const preview = document.getElementById('nextPreview');
+  preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;"><div><div style="font-size:16px;font-weight:700;">Day ${ongoing.id}｜${ongoing.date}</div><div style="margin-top:4px;font-size:13px;color:#758877;">${ongoing.theme}</div></div><button id="openDayBtn" style="border:none;background:#4a6b55;color:white;border-radius:999px;padding:9px 14px;font:inherit;cursor:pointer;">打開 ↗</button></div>`;
+  const list = document.createElement('div'); list.style.marginTop = '12px'; list.style.display = 'flex'; list.style.flexDirection = 'column'; list.style.gap = '8px';
+  ongoing.items.slice(0,3).forEach(item => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;border:1px solid #e2e8dd;background:white;border-radius:18px;padding:10px 12px;';
+    row.innerHTML = `<div style="width:34px;height:34px;border-radius:12px;background:#eef4e3;display:grid;place-items:center;">${iconMap[item.type] || '•'}</div><div style="min-width:58px;font-size:14px;font-weight:700;">${item.time}</div><div style="font-size:14px;color:#4f6b55;">${item.text}</div>`;
+    list.appendChild(row);
+  });
+  preview.appendChild(list);
+  document.getElementById('openDayBtn').onclick = () => { state.selectedDay = ongoing.id; setTab('itinerary'); renderDays(); renderItems(); };
+}
+function renderDays() {
+  const row = document.getElementById('dayRow'); row.innerHTML = '';
+  trip.days.forEach(day => {
+    const btn = document.createElement('button'); btn.className = 'chipBtn' + (state.selectedDay === day.id ? ' active' : '');
+    btn.innerHTML = `<div class="k">Day ${day.id}</div><div class="v">${day.date}</div>`;
+    btn.onclick = () => { state.selectedDay = day.id; renderDays(); renderItems(); };
+    row.appendChild(btn);
+  });
+}
+function renderFilters() {
+  const row = document.getElementById('filterRow'); row.innerHTML = '';
+  filters.forEach(f => { const btn = document.createElement('button'); btn.className = 'chipBtn' + (state.filter === f.key ? ' active' : ''); btn.textContent = f.label; btn.onclick = () => { state.filter = f.key; renderFilters(); renderItems(); }; row.appendChild(btn); });
+}
+function renderItems() {
+  const day = trip.days.find(d => d.id === state.selectedDay) || trip.days[0];
+  document.getElementById('activeTheme').textContent = day.theme; document.getElementById('activeDate').textContent = day.date;
+  const container = document.getElementById('itemsContainer'); container.innerHTML = '';
+  let items = day.items;
+  if (state.filter !== 'all') items = items.filter(item => item.type === state.filter);
+  if (state.search.trim()) items = items.filter(item => item.text.toLowerCase().includes(state.search.toLowerCase()) || item.time.includes(state.search));
+  items.forEach(item => {
+    const originalIndex = day.items.findIndex(x => x.time === item.time && x.text === item.text);
+    const key = `${day.id}-${originalIndex}`;
+    const done = !!state.checked[key];
+    const card = document.createElement('div'); card.className = 'itemCard' + (done ? ' done' : '');
+    card.innerHTML = `<div class="itemRow"><button class="check ${done ? 'done' : ''}">✓</button><div class="itemMain"><div class="itemHead"><div class="timePill">${item.time}</div><div class="iconPill">${iconMap[item.type] || '•'}</div></div><div class="itemText">${item.text}</div><div class="meta"><span class="pill" style="${statusStyles[item.status] || statusStyles['休息']}">${item.status}</span><span class="tag">${item.type}</span></div></div></div>`;
+    card.querySelector('.check').onclick = () => { state.checked[key] = !state.checked[key]; saveState(); renderHome(); renderItems(); };
+    container.appendChild(card);
+  });
+}
+function renderPacking() {
+  const s = packingStats(); document.getElementById('packingPct').textContent = `${s.pct}%`; document.getElementById('packingText').textContent = `${s.done} / ${s.total} 件`; document.getElementById('packingBar').style.width = `${s.pct}%`;
+  const container = document.getElementById('packingContainer'); container.innerHTML = '';
+  trip.packing.forEach((group, gIdx) => {
+    const card = document.createElement('div'); card.className = 'card';
+    card.innerHTML = `<div style="font-size:14px;font-weight:700;">${group.category}</div>`;
+    group.items.forEach((item, iIdx) => {
+      const key = `${gIdx}-${iIdx}`; const done = !!state.packingChecked[key];
+      const btn = document.createElement('button');
+      btn.style.cssText = `width:100%;display:flex;align-items:center;gap:12px;border-radius:18px;border:1px solid #d3dbd0;padding:12px 12px;margin-top:8px;background:${done ? '#eef6ee' : 'white'};cursor:pointer;text-align:left;${done ? 'border-color:#b7ccb8;' : ''}`;
+      btn.innerHTML = `<div class="check ${done ? 'done' : ''}">✓</div><div style="font-size:14px;${done ? 'text-decoration:line-through;color:#7b8e7c;' : ''}">${item}</div><div style="margin-left:auto;color:#9aac9b;">›</div>`;
+      btn.onclick = () => { state.packingChecked[key] = !state.packingChecked[key]; saveState(); renderHome(); renderPacking(); };
+      card.appendChild(btn);
+    });
+    container.appendChild(card);
+  });
+}
+function renderSummary() {
+  const highlights = [
+    '6/10 凌晨出發，當日下午入住酒店',
+    '6/11 淺草寺＋原宿／表參道',
+    '6/12 晚上 20:00 Ushigoro S',
+    '6/13 Ginza 掃貨＋夜景散步',
+    '6/14 15:45 回港，19:40 抵達香港'
+  ];
+  const box = document.getElementById('highlights');
+  box.innerHTML = highlights.map(t => `<div style="border-radius:18px;background:white;border:1px solid #e0e6db;padding:12px 14px;font-size:14px;color:#506b56;">• ${t}</div>`).join('');
+  const notes = document.getElementById('notes'); notes.value = state.notes; notes.oninput = (e) => { state.notes = e.target.value; saveState(); };
+}
+function showToast(msg='已可加入主畫面') { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
+function boot() {
+  document.getElementById('statusTime').textContent = new Date().toLocaleTimeString('zh-HK', { hour:'2-digit', minute:'2-digit' });
+  setInterval(() => document.getElementById('statusTime').textContent = new Date().toLocaleTimeString('zh-HK', { hour:'2-digit', minute:'2-digit' }), 60000);
+  document.getElementById('countdown').textContent = countdownText();
+  setInterval(() => document.getElementById('countdown').textContent = countdownText(), 60000);
+  document.querySelectorAll('.tab, .bbtn').forEach(btn => btn.onclick = () => setTab(btn.dataset.tab));
+  document.querySelectorAll('.quick').forEach(btn => btn.onclick = () => setTab(btn.dataset.go));
+  document.getElementById('searchInput').addEventListener('input', (e) => { state.search = e.target.value; renderItems(); });
+  renderDays(); renderFilters(); renderHome(); renderItems(); renderPacking(); renderSummary(); setTab('home');
+  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => null); }
+}
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; showToast('可加入主畫面 / 安裝 App'); });
+window.addEventListener('appinstalled', () => showToast('已安裝到主畫面'));
+boot();
+</script>
+</body>
+</html>

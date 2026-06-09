@@ -1,0 +1,21 @@
+{
+  "name": "Tokyo Trip Planner PWA",
+  "short_name": "TokyoTrip",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5edd7",
+  "theme_color": "#46684f",
+  "description": "東京旅程行程、清單、備註與安裝版 PWA",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
